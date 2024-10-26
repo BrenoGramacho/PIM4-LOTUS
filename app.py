@@ -70,7 +70,7 @@ def excluir_colaborador(colaborador_id):
     flash('Colaborador excluído com sucesso!')  # Adicione uma mensagem de sucesso
     return redirect(url_for('colaborador'))  # Redireciona para a página de colaboradores
 
-@app.route('/confirmar_exclusao/<int:colaborador_id>', methods=['GET', 'POST'])
+@app.route('/confirmar_colaborador/<int:colaborador_id>', methods=['GET', 'POST'])
 def confirmar_exclusao(colaborador_id):
     colaborador = Colaborador.query.get_or_404(colaborador_id)
     if request.method == 'POST':
@@ -81,7 +81,76 @@ def confirmar_exclusao(colaborador_id):
         return redirect(url_for('colaborador'))  # Redireciona para a página de colaboradores
     
     # Renderiza a página de confirmação
-    return render_template('colaborador/confirmar_exclusao.html', colaborador=colaborador)
+    return render_template('colaborador/confirmar_colaborador.html', colaborador=colaborador)
+####################################################################
+#PROGRAMAÇÃO DO PRODUCAO#
+
+class Producao(db.Model):
+    __tablename__ = 'Producao'
+    id = db.Column('id_Producao', db.Integer, primary_key=True, nullable=False)
+    nome = db.Column('nome_Producao', db.String(100), nullable=True)
+    fornecedor = db.Column('fornecedor_Producao', db.String(100), nullable=True)  # Novo campo
+    quantidade = db.Column('quantidade_Producao', db.Integer, nullable=True)       # Novo campo
+    data = db.Column('data_Producao', db.Date, nullable=True)                      # Novo campo
+    preco = db.Column('preco_Producao', db.Float, nullable=True)                    # Novo campo
+
+@app.route('/producao')  # Atualizando a rota
+def producao():
+    producoes = Producao.query.all()  # Atualizando a consulta para 'Produção'
+    return render_template('producao/Producao.html', producoes=producoes)  # Atualizando o template
+
+@app.route('/adicionar_producao', methods=['GET', 'POST'])  # Atualizando a rota
+def adicionar_producao():  # Atualizando a função
+    if request.method == 'POST':
+        nome = request.form['nome']
+        fornecedor = request.form['fornecedor']
+        quantidade = request.form['quantidade']
+        data = request.form['data']
+        preco = request.form['preco']
+
+        # Validação básica
+        if not nome or not fornecedor or not quantidade or not data or not preco:
+            flash('Por favor, preencha todos os campos.')
+            return redirect('/adicionar_producao')  # Atualizando o redirecionamento
+
+        nova_producao = Producao(
+            nome=nome,
+            fornecedor=fornecedor,
+            quantidade=quantidade,
+            data=data,
+            preco=preco
+        )  # Atualizando para 'Produção'
+        db.session.add(nova_producao)
+        db.session.commit()
+
+        flash('Produção adicionada com sucesso!')  # Atualizando a mensagem
+        return redirect('/producao')  # Atualizando o redirecionamento
+
+    return render_template('producao/forms_Producao.html')  # Atualizando o template
+
+@app.route('/editar/<int:producao_id>', methods=['GET', 'POST'])
+def editar_producao(producao_id):
+    producao = Producao.query.get_or_404(producao_id)
+    if request.method == 'POST':
+        producao.nome = request.form['nome']
+        producao.fornecedor = request.form['fornecedor']
+        producao.quantidade = request.form['quantidade']
+        producao.data = request.form['data']
+        producao.preco = request.form['preco']
+        db.session.commit()
+        flash('Produção editada com sucesso!')  # Adicionando mensagem de sucesso
+        return redirect(url_for('producao'))  # Redireciona para a lista de produções
+    return render_template('producao/item_Producao.html', producao=producao)
+
+
+@app.route('/excluir/<int:producao_id>', methods=['POST'])  # Atualizando a rota
+def excluir_producao(producao_id):  # Atualizando a função
+    producao = Producao.query.get_or_404(producao_id)  # Atualizando para 'Produção'
+    db.session.delete(producao)
+    db.session.commit()
+    flash('Produção excluída com sucesso!')  # Atualizando a mensagem
+    return redirect(url_for('producao'))  # Atualizando o redirecionamento
+
 
 ####################################################################
 #PROGRAMAÇÃO DO LOGIN#
