@@ -68,18 +68,6 @@ def excluir_colaborador(colaborador_id):
     flash('Colaborador excluído com sucesso!')  # Adicione uma mensagem de sucesso
     return redirect(url_for('colaborador'))  # Redireciona para a página de colaboradores
 
-@app.route('/confirmar_colaborador/<int:colaborador_id>', methods=['GET', 'POST'])
-def confirmar_exclusao(colaborador_id):
-    colaborador = Colaborador.query.get_or_404(colaborador_id)
-    if request.method == 'POST':
-        # Se o usuário confirmar a exclusão, deletamos o colaborador
-        db.session.delete(colaborador)
-        db.session.commit()
-        flash('Colaborador excluído com sucesso!', 'success')  # Mensagem de sucesso
-        return redirect(url_for('colaborador'))  # Redireciona para a página de colaboradores
-    
-    # Renderiza a página de confirmação
-    return render_template('colaborador/confirmar_colaborador.html', colaborador=colaborador)
 ####################################################################
 #PROGRAMAÇÃO DO PRODUCAO#
 
@@ -124,7 +112,6 @@ def adicionar_producao():  # Atualizando a função
         flash('Produção adicionada com sucesso!')  # Atualizando a mensagem
         return redirect('/producao')  # Atualizando o redirecionamento
 
-    return render_template('producao/forms_Producao.html')  # Atualizando o template
 
 @app.route('/editar/<int:producao_id>', methods=['GET', 'POST'])
 def editar_producao(producao_id):
@@ -139,13 +126,18 @@ def editar_producao(producao_id):
         return redirect(url_for('producao', producao_id = producao.id))  # Redireciona para a lista de produções
 
 
-@app.route('/excluir/<int:producao_id>', methods=['POST'])  # Atualizando a rota
-def excluir_producao(producao_id):  # Atualizando a função
-    producao = Producao.query.get_or_404(producao_id)  # Atualizando para 'Produção'
-    db.session.delete(producao)
-    db.session.commit()
-    flash('Produção excluída com sucesso!')  # Atualizando a mensagem
-    return redirect(url_for('producao'))  # Atualizando o redirecionamento
+@app.route('/excluir/<int:producao_id>', methods=['POST'])
+def excluir_producao(producao_id):
+    try:
+        producao = Producao.query.get_or_404(producao_id)
+        print(f'Tentando excluir a produção: {producao}')
+        db.session.delete(producao)
+        db.session.commit()
+        flash('Produção excluída com sucesso!', 'success')
+    except Exception as e:
+        print(f'Erro ao excluir produção: {e}')  # Imprime o erro no console
+        flash(f'Ocorreu um erro ao excluir a produção: {e}', 'danger')
+    return redirect(url_for('producao'))
 
 
 ####################################################################
