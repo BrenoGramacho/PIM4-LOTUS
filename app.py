@@ -47,8 +47,6 @@ def adicionar_colaborador():
         flash('Colaborador adicionado com sucesso!')
         return redirect('/colaborador')  # Redireciona para a página inicial
 
-    # Se o método for GET, renderiza o formulário
-    return render_template('colaborador/forms_Colaborador.html')
 
 
 @app.route('/editar/<int:colaborador_id>', methods=['GET', 'POST'])
@@ -138,9 +136,7 @@ def editar_producao(producao_id):
         producao.data = request.form['data']
         producao.preco = request.form['preco']
         db.session.commit()
-        flash('Produção editada com sucesso!')  # Adicionando mensagem de sucesso
-        return redirect(url_for('producao'))  # Redireciona para a lista de produções
-    return render_template('producao/item_Producao.html', producao=producao)
+        return redirect(url_for('producao', producao_id = producao.id))  # Redireciona para a lista de produções
 
 
 @app.route('/excluir/<int:producao_id>', methods=['POST'])  # Atualizando a rota

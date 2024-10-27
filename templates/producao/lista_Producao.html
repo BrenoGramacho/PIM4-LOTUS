@@ -51,46 +51,44 @@
                 </tr>
 
                 <!-- Modal para edição de produção -->
-                <!-- Modal para edição de produção -->
-<div class="modal fade" id="editarProducaoModal-{{ producao.id }}" tabindex="-1" aria-labelledby="editarProducaoLabel-{{ producao.id }}" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editarProducaoLabel-{{ producao.id }}">Editar Produção</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{{ url_for('editar_producao', producao_id=producao.id) }}">
-                    <div class="mb-3">
-                        <label for="nome-{{ producao.id }}" class="form-label">Nome:</label>
-                        <input type="text" class="form-control" id="nome-{{ producao.id }}" name="nome" value="{{ producao.nome }}" required>
+                <div class="modal fade" id="editarProducaoModal-{{ producao.id }}" tabindex="-1" aria-labelledby="editarProducaoLabel-{{ producao.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editarProducaoLabel-{{ producao.id }}">Editar Produção</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="{{ url_for('editar_producao', producao_id=producao.id) }}">
+                                    <div class="mb-3">
+                                        <label for="nome-{{ producao.id }}" class="form-label">Nome:</label>
+                                        <input type="text" class="form-control" id="nome-{{ producao.id }}" name="nome" value="{{ producao.nome }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="fornecedor-{{ producao.id }}" class="form-label">Fornecedor:</label>
+                                        <input type="text" class="form-control" id="fornecedor-{{ producao.id }}" name="fornecedor" value="{{ producao.fornecedor }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="quantidade-{{ producao.id }}" class="form-label">Quantidade:</label>
+                                        <input type="number" class="form-control" id="quantidade-{{ producao.id }}" name="quantidade" value="{{ producao.quantidade }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="data-{{ producao.id }}" class="form-label">Data:</label>
+                                        <input type="date" class="form-control" id="data-{{ producao.id }}" name="data" value="{{ producao.data}}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="preco-{{ producao.id }}" class="form-label">Preço:</label>
+                                        <input type="number" class="form-control" id="preco-{{ producao.id }}" name="preco" value="{{ producao.preco }}" step="0.01" required>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Salvar</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="fornecedor-{{ producao.id }}" class="form-label">Fornecedor:</label>
-                        <input type="text" class="form-control" id="fornecedor-{{ producao.id }}" name="fornecedor" value="{{ producao.fornecedor }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="quantidade-{{ producao.id }}" class="form-label">Quantidade:</label>
-                        <input type="number" class="form-control" id="quantidade-{{ producao.id }}" name="quantidade" value="{{ producao.quantidade }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="data-{{ producao.id }}" class="form-label">Data:</label>
-                        <input type="date" class="form-control" id="data-{{ producao.id }}" name="data" value="{{ producao.data.strftime('%Y-%m-%d') }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="preco-{{ producao.id }}" class="form-label">Preço:</label>
-                        <input type="number" class="form-control" id="preco-{{ producao.id }}" name="preco" value="{{ producao.preco }}" step="0.01" required>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
+                </div>
 
                 <!-- Modal de confirmação de exclusão -->
                 <div class="modal fade" id="confirmModal{{ producao.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-{{ producao.id }}" aria-hidden="true">
