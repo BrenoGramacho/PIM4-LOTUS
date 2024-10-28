@@ -1,6 +1,19 @@
+####################################################################
+#Programação requirements
+
+#region: Requirements
+
 from flask import Flask, render_template, request, redirect, flash, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from datetime import datetime
+
+#endregion
+
+####################################################################
+#Programação inicio
+
+#region: Inicio
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secreto'  # Defina uma chave secreta única
@@ -15,8 +28,12 @@ def index():
     
     return render_template('index.html')
 
-#########################################################################################################
+#endregion
+
+####################################################################
 #Programação colaboradores
+
+#region: Colaboradores
 
 class Colaborador(db.Model):
     __tablename__ = 'Colaboradores'
@@ -49,7 +66,7 @@ def adicionar_colaborador():
 
 
 
-@app.route('/editar/<int:colaborador_id>', methods=['GET', 'POST'])
+@app.route('/editar_colaborador/<int:colaborador_id>', methods=['GET', 'POST'])
 def editar_colaborador(colaborador_id):
     colaborador = Colaborador.query.get_or_404(colaborador_id)
     if request.method == 'POST':
@@ -60,7 +77,7 @@ def editar_colaborador(colaborador_id):
         
     return render_template('colaborador/item_Colaborador.html', colaborador=colaborador)
 
-@app.route('/excluir/<int:colaborador_id>', methods=['POST'])
+@app.route('/excluir_colaborador/<int:colaborador_id>', methods=['POST'])
 def excluir_colaborador(colaborador_id):
     colaborador = Colaborador.query.get_or_404(colaborador_id)
     db.session.delete(colaborador)
@@ -68,8 +85,13 @@ def excluir_colaborador(colaborador_id):
     flash('Colaborador excluído com sucesso!')  # Adicione uma mensagem de sucesso
     return redirect(url_for('colaborador'))  # Redireciona para a página de colaboradores
 
+#endregion
+
 ####################################################################
-#PROGRAMAÇÃO DO PRODUCAO#
+#PROGRAMAÇÃO producao
+
+#region: Producao
+
 
 class Producao(db.Model):
     __tablename__ = 'Producao'
@@ -91,7 +113,7 @@ def adicionar_producao():  # Atualizando a função
         nome = request.form['nome']
         fornecedor = request.form['fornecedor']
         quantidade = request.form['quantidade']
-        data = request.form['data']
+        data = datetime.strptime(request.form['data'],'%Y-%m-%d').date()
         preco = request.form['preco']
 
         # Validação básica
@@ -113,20 +135,20 @@ def adicionar_producao():  # Atualizando a função
         return redirect('/producao')  # Atualizando o redirecionamento
 
 
-@app.route('/editar/<int:producao_id>', methods=['GET', 'POST'])
+@app.route('/editar_producao/<int:producao_id>', methods=['POST'])
 def editar_producao(producao_id):
     producao = Producao.query.get_or_404(producao_id)
     if request.method == 'POST':
         producao.nome = request.form['nome']
         producao.fornecedor = request.form['fornecedor']
         producao.quantidade = request.form['quantidade']
-        producao.data = request.form['data']
+        producao.data = datetime.strptime(request.form['data'],'%Y-%m-%d').date()
         producao.preco = request.form['preco']
         db.session.commit()
         return redirect(url_for('producao', producao_id = producao.id))  # Redireciona para a lista de produções
 
 
-@app.route('/excluir/<int:producao_id>', methods=['POST'])
+@app.route('/excluir_producao/<int:producao_id>', methods=['POST'])
 def excluir_producao(producao_id):
     try:
         producao = Producao.query.get_or_404(producao_id)
@@ -139,9 +161,12 @@ def excluir_producao(producao_id):
         flash(f'Ocorreu um erro ao excluir a produção: {e}', 'danger')
     return redirect(url_for('producao'))
 
+#endregion
 
 ####################################################################
-#PROGRAMAÇÃO DO LOGIN#
+#PROGRAMAÇÃO login
+
+#region: login
 
 class Usuario(db.Model):
     __tablename__ = 'Usuarios'
@@ -191,20 +216,28 @@ def login():
     return render_template('cripto/login.html')
 
 
+#endregion
 
+#####################################################################
+#Programação home
 
-###################################################################################################
-#Programação da home
+#region: Home
 
 @app.route('/home')
 def home():
     return render_template('home.html')
 
+#endregion
 
-###################################################################################################
-#Programação da main
+#####################################################################
+#Programação main
+
+#region: Main
+
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Cria as tabelas do banco de dados
     app.run(debug=True)
+
+#endregion
