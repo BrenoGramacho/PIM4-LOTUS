@@ -5,30 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-
     <title>Página Inicial</title>
     <style>
         .custom-bg-36802D {
             background-color: #36802D; /* Um tom de verde */
         }
     </style>
-    
 </head>
 <body>
-
 
     <header class="custom-bg-36802D text-white text-center py-3">
         <h1>Bem-vindo</h1>
         <div class="mt-5">
-            <a href="/perfil" class="btn btn-light"><i class="bi bi-person-circle"></i> Perfil</a>
+            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#perfilModal"><i class="bi bi-person-circle"></i> Perfil</button>
             <a href="/colaborador" class="btn btn-light">Colaborador</a>
             <a href="/producao" class="btn btn-light">Produção</a>
             <a href="/fornecedores" class="btn btn-light">Fornecedor</a>
             <a href="/clientes" class="btn btn-light">Clientes</a>
-            <a href="/configuracao" class="btn btn-light"><i class="bi bi-gear-fill"></i></a>
+            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#configuracaoModal"><i class="bi bi-gear-fill"></i></button>
         </div>
     </header>
-    
+
+    <!-- Modal para Perfil -->
+    <div class="modal fade" id="perfilModal" tabindex="-1" aria-labelledby="perfilModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="perfilModalLabel">Perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Você está no perfil.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Configuração -->
+    <div class="modal fade" id="configuracaoModal" tabindex="-1" aria-labelledby="configuracaoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="configuracaoModalLabel">Configurações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-grid gap-2">
+                        <a href="/suporte" class="btn btn-success">Suporte Técnico</a>
+                        <a href="/contato" class="btn btn-success">Contato Lotus</a>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

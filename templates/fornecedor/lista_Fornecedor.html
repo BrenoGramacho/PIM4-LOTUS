@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <title>Lista de Produção</title>
+    <title>Lista de Fornecedores</title>
     <style>
         .custom-bg-36802D {
             background-color: #36802D; /* Um tom de verde */
@@ -15,84 +15,78 @@
 
     <div class="container mt-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="me-3">Lista de Produção</h2>
-       
-
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#adicionarProducaoModal">Adicionar</button>
+            <h2 class="me-3">Lista de Fornecedores</h2>
+            <!-- Botão para abrir o modal de adição -->
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#adicionarFornecedorModal">Adicionar</button>
         </div>
-                    
- 
         <!-- Formulário de pesquisa -->
-        <form class="d-flex align-items-stretch" action="{{ url_for('pesquisar_producao') }}" method="GET">
+        <form class="d-flex align-items-stretch" action="{{ url_for('pesquisar_fornecedor') }}" method="GET">
             <div class="mt-3 d-flex">
-                <a href="{{ url_for('producao') }}" class="btn btn-secondary me-2 h-100">Voltar</a>
+                <a href="{{ url_for('fornecedores') }}" class="btn btn-secondary me-2 h-100">Voltar</a>
                 <input class="form-control me-2 h-100" type="search" name="nome" placeholder="Pesquisar por nome" aria-label="Pesquisar">
                 <button class="btn btn-outline-primary h-100" type="submit">Pesquisar</button>
             </div>
         </form>
-        
-        
-        
         
         <table class="table">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
-                    <th>Fornecedor</th>
-                    <th>Quantidade</th>
-                    <th>Data</th>
-                    <th>Preço</th>
+                    <th>Endereço</th>
+                    <th>CNPJ/CPF</th>
+                    <th>Contato</th>
+                    <th>E-mail</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
-                {% for producao in producoes %}
+                {% for fornecedor in fornecedores %}
                 <tr>
-                    <td>{{ producao.id }}</td>
-                    <td>{{ producao.nome }}</td>
-                    <td>{{ producao.fornecedor }}</td>
-                    <td>{{ producao.quantidade }}</td>
-                    <td>{{ producao.data }}</td>
-                    <td>{{ producao.preco }}</td>
+                    <td>{{ fornecedor.id }}</td>
+                    <td>{{ fornecedor.nome }}</td>
+                    <td>{{ fornecedor.endereco }}</td>
+                    <td>{{ fornecedor.cnpj_pf }}</td>
+                    <td>{{ fornecedor.contato }}</td>
+                    <td>{{ fornecedor.email }}</td>
                     <td>
                         <!-- Botão para abrir o modal de edição -->
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editarProducaoModal-{{ producao.id }}">Editar</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editarFornecedorModal-{{ fornecedor.id }}">Editar</button>
                         
                         <!-- Botão para abrir o modal de exclusão -->
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal{{ producao.id }}">Excluir</button>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal{{ fornecedor.id }}">Excluir</button>
                     </td>                
                 </tr>
 
-                <!-- Modal para edição de produção -->
-                <div class="modal fade" id="editarProducaoModal-{{ producao.id }}" tabindex="-1" aria-labelledby="editarProducaoLabel-{{ producao.id }}" aria-hidden="true">
+                <!-- Modal para edição de fornecedor -->
+                <div class="modal fade" id="editarFornecedorModal-{{ fornecedor.id }}" tabindex="-1" aria-labelledby="editarFornecedorLabel-{{ fornecedor.id }}" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="editarProducaoLabel-{{ producao.id }}">Editar Produção</h5>
+                                <h5 class="modal-title" id="editarFornecedorLabel-{{ fornecedor.id }}">Editar Fornecedor</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="{{ url_for('editar_producao', producao_id=producao.id) }}">
+                                <form method="POST" action="{{ url_for('editar_fornecedor', fornecedor_id=fornecedor.id) }}">
                                     <div class="mb-3">
-                                        <label for="nome-{{ producao.id }}" class="form-label">Nome:</label>
-                                        <input type="text" class="form-control" id="nome-{{ producao.id }}" name="nome" value="{{ producao.nome }}" required>
+                                        <label for="nome-{{ fornecedor.id }}" class="form-label">Nome:</label>
+                                        <input type="text" class="form-control" id="nome-{{ fornecedor.id }}" name="nome" value="{{ fornecedor.nome }}" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="fornecedor-{{ producao.id }}" class="form-label">Fornecedor:</label>
-                                        <input type="text" class="form-control" id="fornecedor-{{ producao.id }}" name="fornecedor" value="{{ producao.fornecedor }}" required>
+                                        <label for="endereco-{{ fornecedor.id }}" class="form-label">Endereço:</label>
+                                        <input type="text" class="form-control" id="endereco-{{ fornecedor.id }}" name="endereco" value="{{ fornecedor.endereco }}">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="quantidade-{{ producao.id }}" class="form-label">Quantidade:</label>
-                                        <input type="number" class="form-control" id="quantidade-{{ producao.id }}" name="quantidade" value="{{ producao.quantidade }}" required>
+                                        <label for="cnpj_pf-{{ fornecedor.id }}" class="form-label">CNPJ/CPF:</label>
+                                        <input type="text" class="form-control" id="cnpj_pf-{{ fornecedor.id }}" name="cnpj_pf" value="{{ fornecedor.cnpj_pf }}">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="data-{{ producao.id }}" class="form-label">Data:</label>
-                                        <input type="date" class="form-control" id="data-{{ producao.id }}" name="data" value="{{ producao.data}}" required>
+                                        <label for="contato-{{ fornecedor.id }}" class="form-label">Contato:</label>
+                                        <input type="text" class="form-control" id="contato-{{ fornecedor.id }}" name="contato" value="{{ fornecedor.contato }}">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="preco-{{ producao.id }}" class="form-label">Preço:</label>
-                                        <input type="number" class="form-control" id="preco-{{ producao.id }}" name="preco" value="{{ producao.preco }}" step="0.01" required>
+                                        <label for="email-{{ fornecedor.id }}" class="form-label">E-mail:</label>
+                                        <input type="email" class="form-control" id="email-{{ fornecedor.id }}" name="email" value="{{ fornecedor.email }}">
                                     </div>
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-primary">Salvar</button>
@@ -105,18 +99,18 @@
                 </div>
 
                 <!-- Modal de confirmação de exclusão -->
-                <div class="modal fade" id="confirmModal{{ producao.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-{{ producao.id }}" aria-hidden="true">
+                <div class="modal fade" id="confirmModal{{ fornecedor.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-{{ fornecedor.id }}" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="confirmModalLabel-{{ producao.id }}">Confirmar Exclusão</h5>
+                                <h5 class="modal-title" id="confirmModalLabel-{{ fornecedor.id }}">Confirmar Exclusão</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                Você tem certeza que deseja excluir a produção <strong>{{ producao.nome }}</strong>?
+                                Você tem certeza que deseja excluir o fornecedor <strong>{{ fornecedor.nome }}</strong>?
                             </div>
                             <div class="modal-footer">
-                                <form method="POST" action="{{ url_for('excluir_producao', producao_id=producao.id) }}" class="d-inline">
+                                <form method="POST" action="{{ url_for('excluir_fornecedor', fornecedor_id=fornecedor.id) }}" class="d-inline">
                                     <button type="submit" class="btn btn-danger">Confirmar</button>
                                 </form>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -126,42 +120,42 @@
                 </div>
                 {% else %}
                 <tr>
-                    <td colspan="7">Nenhuma produção encontrada.</td>
+                    <td colspan="7">Nenhum fornecedor encontrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <!-- Modal para adição de produção -->
-    <div class="modal fade" id="adicionarProducaoModal" tabindex="-1" aria-labelledby="adicionarProducaoLabel" aria-hidden="true">
+    <!-- Modal para adição de fornecedor -->
+    <div class="modal fade" id="adicionarFornecedorModal" tabindex="-1" aria-labelledby="adicionarFornecedorLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="adicionarProducaoLabel">Adicionar Produção</h5>
+                    <h5 class="modal-title" id="adicionarFornecedorLabel">Adicionar Fornecedor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ url_for('adicionar_producao') }}">
+                    <form method="POST" action="{{ url_for('adicionar_fornecedor') }}">
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome:</label>
                             <input type="text" class="form-control" id="nome" name="nome" required>
                         </div>
                         <div class="mb-3">
-                            <label for="fornecedor" class="form-label">Fornecedor:</label>
-                            <input type="text" class="form-control" id="fornecedor" name="fornecedor" required>
+                            <label for="endereco" class="form-label">Endereço:</label>
+                            <input type="text" class="form-control" id="endereco" name="endereco">
                         </div>
                         <div class="mb-3">
-                            <label for="quantidade" class="form-label">Quantidade:</label>
-                            <input type="number" class="form-control" id="quantidade" name="quantidade" required>
+                            <label for="cnpj_pf" class="form-label">CNPJ/CPF:</label>
+                            <input type="text" class="form-control" id="cnpj_pf" name="cnpj_pf">
                         </div>
                         <div class="mb-3">
-                            <label for="data" class="form-label">Data:</label>
-                            <input type="date" class="form-control" id="data" name="data" required>
+                            <label for="contato" class="form-label">Contato:</label>
+                            <input type="text" class="form-control" id="contato" name="contato">
                         </div>
                         <div class="mb-3">
-                            <label for="preco" class="form-label">Preço:</label>
-                            <input type="number" class="form-control" id="preco" name="preco" required step="0.01">
+                            <label for="email" class="form-label">E-mail:</label>
+                            <input type="email" class="form-control" id="email" name="email">
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-success">Adicionar</button>
