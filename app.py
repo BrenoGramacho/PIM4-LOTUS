@@ -420,12 +420,6 @@ def login_required(f):
     return decorated_function
 
 
-# Rota de Registro
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-        
-    return render_template('cripto/register.html')
-
 # Rota de Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
