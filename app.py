@@ -9,6 +9,7 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 from functools import wraps
 
+
 #endregion
 
 ####################################################################
@@ -55,6 +56,8 @@ class Colaborador(db.Model):
     usuario = db.Column('usuario_Colaborador', db.String(50), unique=True, nullable=False)
     senha = db.Column('senha_Colaborador', db.String(128), nullable=False)  # Armazena a senha criptografada
 
+    pedidos = db.relationship('Pedido', back_populates='colaborador')
+
 
 @app.route('/colaborador')
 @verificar_acesso(['Recursos humanos', 'Administrador'])
@@ -92,26 +95,27 @@ def editar_colaborador(colaborador_id):
     if request.method == 'POST':
         colaborador.nome = request.form['nome']
         colaborador.email = request.form['email']
-
-
-        # Atualiza a senha somente se um novo valor for fornecido
-        nova_senha = request.form['senha']
-        if nova_senha:
-            colaborador.senha = bcrypt.generate_password_hash(nova_senha).decode('utf-8')
-
         db.session.commit()
         flash('Colaborador atualizado com sucesso!')  # Mensagem de sucesso ao atualizar
         return redirect(url_for('colaborador'))  # Redireciona para a página de colaboradores
 
     return render_template('colaborador/item_Colaborador.html', colaborador=colaborador)
 
+
 @app.route('/excluir_colaborador/<int:colaborador_id>', methods=['POST'])
 def excluir_colaborador(colaborador_id):
     colaborador = Colaborador.query.get_or_404(colaborador_id)
+
+    # Verifica se o colaborador é administrador
+    if colaborador.setor == 'Administrador':
+        flash('Não é possível excluir um administrador.', 'danger')
+        return redirect(url_for('colaborador'))
+
     db.session.delete(colaborador)
     db.session.commit()
-    flash('Colaborador excluído com sucesso!')  # Mensagem de sucesso
-    return redirect(url_for('colaborador'))  # Redireciona para a página de colaboradores
+    flash('Colaborador excluído com sucesso!', 'success')
+    return redirect(url_for('colaborador'))
+
 
 @app.route('/pesquisar_colaborador', methods=['GET'])
 def pesquisar_colaborador():
@@ -124,10 +128,10 @@ def pesquisar_colaborador():
 
 @app.route('/alterar_senha', methods=['GET', 'POST'])
 def alterar_senha():
-    if request.method == 'POST':
-        usuario_id = session.get('user_id')  # Obtém o ID do usuário logado
-        colaborador = Colaborador.query.get(usuario_id)  # Busca o colaborador pelo ID
+    usuario_id = session.get('user_id')  # Obtém o ID do usuário logado
+    colaborador = Colaborador.query.get(usuario_id)  # Busca o colaborador pelo ID
 
+    if request.method == 'POST':
         senha_atual = request.form['senha_atual']
         nova_senha = request.form['nova_senha']
 
@@ -137,16 +141,12 @@ def alterar_senha():
             nova_senha_criptografada = bcrypt.generate_password_hash(nova_senha).decode('utf-8')
             colaborador.senha = nova_senha_criptografada  # Atualiza a senha
             db.session.commit()  # Salva as alterações
-            flash('Senha alterada com sucesso!', 'success')
-            return redirect('/home')  # Redireciona para a página inicial
+            flash('Senha alterada com sucesso!', 'success_alterar_senha')  # Mensagem de sucesso
         else:
-            flash('Senha atual incorreta. Tente novamente.', 'danger')
+            flash('Senha atual incorreta. Tente novamente.', 'danger_alterar_senha')  # Mensagem de erro
 
-    return render_template('alterar_senha.html')  # Retorna o template para alterar senha
-
-
-
-
+    # Retorna para a mesma página com as mensagens flash
+    return render_template('configuracoes/alterarSenha.html', colaborador=colaborador)
 
 
 
@@ -161,10 +161,13 @@ class Producao(db.Model):
     __tablename__ = 'Producao'
     id = db.Column('id_Producao', db.Integer, primary_key=True, nullable=False)
     nome = db.Column('nome_Producao', db.String(100), nullable=True)
-    fornecedor = db.Column('fornecedor_Producao', db.String(100), nullable=True)  # Novo campo
-    quantidade = db.Column('quantidade_Producao', db.Integer, nullable=True)       # Novo campo
-    data = db.Column('data_Producao', db.Date, nullable=True)                      # Novo campo
-    preco = db.Column('preco_Producao', db.Float, nullable=True)                    # Novo campo
+    fornecedor = db.Column('fornecedor_Producao', db.String(100), nullable=True)
+    quantidade = db.Column('quantidade_Producao', db.Integer, nullable=True)
+    data = db.Column('data_Producao', db.Date, nullable=True)
+    preco = db.Column('preco_Producao', db.Float, nullable=True)
+
+    pedidos = db.relationship('Pedido', back_populates='producao')  # Esta linha é crucial
+
 
 @app.route('/producao')  # Atualizando a rota
 @verificar_acesso(['Producao', 'Administrador'])
@@ -250,6 +253,9 @@ class Fornecedor(db.Model):
     cnpj_pf = db.Column('cnpj_pf_Fornecedor', db.String(18), nullable=True)
     contato = db.Column('contato_Fornecedor', db.String(100), nullable=True)
     email = db.Column('email_Fornecedor', db.String(100), nullable=True)
+    
+    pedidos = db.relationship('Pedido', back_populates='fornecedor')
+
 
 @app.route('/fornecedores')
 @verificar_acesso(['Vendas', 'Administrador'])
@@ -329,6 +335,9 @@ class Cliente(db.Model):
     cnpj_pf = db.Column('cnpj_pf_Cliente', db.String(18), nullable=True)
     contato = db.Column('contato_Cliente', db.String(100), nullable=True)
     email = db.Column('email_Cliente', db.String(100), nullable=True)
+    
+    pedidos = db.relationship('Pedido', back_populates='cliente')
+
 
 @app.route('/clientes')
 @verificar_acesso(['Vendas', 'Administrador'])
@@ -398,15 +407,108 @@ def pesquisar_cliente():
 #endregion
 
 ####################################################################
+#PROGRAMAÇÃO pedido
+#region: Pedido
+
+class Pedido(db.Model):
+    __tablename__ = 'Pedido'
+    
+    id = db.Column('id_Pedido', db.Integer, primary_key=True, nullable=False)  # ID do pedido
+    tipo = db.Column('tipo_Pedido', db.String(50), nullable=False)  # Tipo do pedido (recebimento ou venda)
+    id_Fornecedor = db.Column('id_Fornecedor', db.Integer, db.ForeignKey('Fornecedor.id_Fornecedor'), nullable=False)
+    id_Cliente = db.Column('id_Cliente', db.Integer, db.ForeignKey('Cliente.id_Cliente'), nullable=True)  # Pode ser N/A para recebimento
+    id_Colaborador = db.Column('id_Colaborador', db.Integer, db.ForeignKey('Colaborador.id_Colaborador'), nullable=False)
+    id_Producao = db.Column('id_Producao', db.Integer, db.ForeignKey('Producao.id_Producao'), nullable=True)  # Pode ser N/A para venda
+
+    # Relacionamentos sem backref
+    fornecedor = db.relationship('Fornecedor')
+    cliente = db.relationship('Cliente')
+    colaborador = db.relationship('Colaborador')
+    producao = db.relationship('Producao')
+
+@app.route('/pedidos', methods=['GET'])
+def lista_pedidos():
+    pedidos = Pedido.query.all()  # Busca todos os pedidos
+    return render_template('pedido/listaPedidos.html', pedidos=pedidos)
+
+@app.route('/adicionar_pedido', methods=['GET', 'POST'])
+def adicionar_pedido():
+    if request.method == 'POST':
+        tipo = request.form['tipo']
+        fornecedor_id = request.form['fornecedor_id']
+        cliente_id = request.form['cliente_id']
+        colaborador_id = request.form['colaborador_id']
+        producao_id = request.form['producao_id']
+        
+        novo_pedido = Pedido(
+            tipo=tipo,
+            id_Fornecedor=fornecedor_id,
+            id_Cliente=cliente_id,
+            id_Colaborador=colaborador_id,
+            id_Producao=producao_id
+        )
+        
+        db.session.add(novo_pedido)
+        db.session.commit()
+        flash('Pedido adicionado com sucesso!')
+        return redirect(url_for('lista_pedidos'))  # Referência corrigida aqui
+    
+    # Para o método GET, você pode passar dados para preencher as opções de fornecedores e clientes
+    fornecedores = Fornecedor.query.all()
+    clientes = Cliente.query.all()
+    colaboradores = Colaborador.query.all()
+    return render_template('adicionar_pedido.html', fornecedores=fornecedores, clientes=clientes, colaboradores=colaboradores)
+
+@app.route('/editar_pedido/<int:pedido_id>', methods=['GET', 'POST'])
+def editar_pedido(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    
+    if request.method == 'POST':
+        pedido.tipo = request.form['tipo']
+        pedido.id_Fornecedor = request.form['fornecedor_id']
+        pedido.id_Cliente = request.form['cliente_id']
+        pedido.id_Colaborador = request.form['colaborador_id']
+        pedido.id_Producao = request.form['producao_id']
+        
+        db.session.commit()
+        flash('Pedido atualizado com sucesso!')
+        return redirect(url_for('lista_pedidos'))  # Referência corrigida aqui
+    
+    fornecedores = Fornecedor.query.all()
+    clientes = Cliente.query.all()
+    colaboradores = Colaborador.query.all()
+    return render_template('editar_pedido.html', pedido=pedido, fornecedores=fornecedores, clientes=clientes, colaboradores=colaboradores)
+
+@app.route('/excluir_pedido/<int:pedido_id>', methods=['POST'])
+def excluir_pedido(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    db.session.delete(pedido)
+    db.session.commit()
+    flash('Pedido excluído com sucesso!')
+    return redirect(url_for('lista_pedidos'))  # Referência corrigida aqui
+
+@app.route('/pesquisar_pedido', methods=['GET'])
+def pesquisar_pedido():
+    # Obtém o parâmetro de tipo da requisição
+    tipo = request.args.get('tipo', '').strip()
+    
+    # Filtra os pedidos com base no tipo, se fornecido
+    if tipo:
+        pedidos = Pedido.query.filter(Pedido.tipo.like(f"%{tipo}%")).all()
+    else:
+        pedidos = Pedido.query.all()
+    
+    # Renderiza o template com a lista de pedidos
+    return render_template('pedido/Pedido.html', pedidos=pedidos)
+
+
+#endregion
+
+
+
+####################################################################
 #PROGRAMAÇÃO login
 #region: Login
-
-# Classe do usuário
-class Usuario(db.Model):
-    __tablename__ = 'Usuarios'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
 
 # Decorador para verificar login
 def login_required(f):
