@@ -9,7 +9,6 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 from functools import wraps
 
-
 #endregion
 
 ####################################################################
@@ -22,6 +21,16 @@ app.config['SECRET_KEY'] = 'secreto'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://JOAOHERMENEGILD/FazendaUrbanaLotus?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+
+# Lista de caminhos de URL que não exigem login
+rotas_livres = ['/', '/login']
+
+@app.before_request
+def check_login():
+    # Verifica se a rota atual é uma exceção com base no caminho da URL
+    if request.path not in rotas_livres and 'user_id' not in session:
+        flash('Por favor, faça login para acessar esta página.', 'warning')
+        return redirect(url_for('login'))
 
 
 @app.route('/')
@@ -56,7 +65,7 @@ class Colaborador(db.Model):
     usuario = db.Column('usuario_Colaborador', db.String(50), unique=True, nullable=False)
     senha = db.Column('senha_Colaborador', db.String(128), nullable=False)  # Armazena a senha criptografada
 
-    pedidos = db.relationship('Pedido', back_populates='colaborador')
+    
 
 
 @app.route('/colaborador')
@@ -166,7 +175,9 @@ class Producao(db.Model):
     data = db.Column('data_Producao', db.Date, nullable=True)
     preco = db.Column('preco_Producao', db.Float, nullable=True)
 
-    pedidos = db.relationship('Pedido', back_populates='producao')  # Esta linha é crucial
+   
+
+    
 
 
 @app.route('/producao')  # Atualizando a rota
@@ -254,7 +265,7 @@ class Fornecedor(db.Model):
     contato = db.Column('contato_Fornecedor', db.String(100), nullable=True)
     email = db.Column('email_Fornecedor', db.String(100), nullable=True)
     
-    pedidos = db.relationship('Pedido', back_populates='fornecedor')
+    
 
 
 @app.route('/fornecedores')
@@ -336,7 +347,7 @@ class Cliente(db.Model):
     contato = db.Column('contato_Cliente', db.String(100), nullable=True)
     email = db.Column('email_Cliente', db.String(100), nullable=True)
     
-    pedidos = db.relationship('Pedido', back_populates='cliente')
+  
 
 
 @app.route('/clientes')
@@ -410,100 +421,7 @@ def pesquisar_cliente():
 #PROGRAMAÇÃO pedido
 #region: Pedido
 
-class Pedido(db.Model):
-    __tablename__ = 'Pedido'
-    
-    id = db.Column('id_Pedido', db.Integer, primary_key=True, nullable=False)  # ID do pedido
-    tipo = db.Column('tipo_Pedido', db.String(50), nullable=False)  # Tipo do pedido (recebimento ou venda)
-    id_Fornecedor = db.Column('id_Fornecedor', db.Integer, db.ForeignKey('Fornecedor.id_Fornecedor'), nullable=False)
-    id_Cliente = db.Column('id_Cliente', db.Integer, db.ForeignKey('Cliente.id_Cliente'), nullable=True)  # Pode ser N/A para recebimento
-    id_Colaborador = db.Column('id_Colaborador', db.Integer, db.ForeignKey('Colaborador.id_Colaborador'), nullable=False)
-    id_Producao = db.Column('id_Producao', db.Integer, db.ForeignKey('Producao.id_Producao'), nullable=True)  # Pode ser N/A para venda
-
-    # Relacionamentos sem backref
-    fornecedor = db.relationship('Fornecedor')
-    cliente = db.relationship('Cliente')
-    colaborador = db.relationship('Colaborador')
-    producao = db.relationship('Producao')
-
-@app.route('/pedidos', methods=['GET'])
-def lista_pedidos():
-    pedidos = Pedido.query.all()  # Busca todos os pedidos
-    return render_template('pedido/listaPedidos.html', pedidos=pedidos)
-
-@app.route('/adicionar_pedido', methods=['GET', 'POST'])
-def adicionar_pedido():
-    if request.method == 'POST':
-        tipo = request.form['tipo']
-        fornecedor_id = request.form['fornecedor_id']
-        cliente_id = request.form['cliente_id']
-        colaborador_id = request.form['colaborador_id']
-        producao_id = request.form['producao_id']
-        
-        novo_pedido = Pedido(
-            tipo=tipo,
-            id_Fornecedor=fornecedor_id,
-            id_Cliente=cliente_id,
-            id_Colaborador=colaborador_id,
-            id_Producao=producao_id
-        )
-        
-        db.session.add(novo_pedido)
-        db.session.commit()
-        flash('Pedido adicionado com sucesso!')
-        return redirect(url_for('lista_pedidos'))  # Referência corrigida aqui
-    
-    # Para o método GET, você pode passar dados para preencher as opções de fornecedores e clientes
-    fornecedores = Fornecedor.query.all()
-    clientes = Cliente.query.all()
-    colaboradores = Colaborador.query.all()
-    return render_template('adicionar_pedido.html', fornecedores=fornecedores, clientes=clientes, colaboradores=colaboradores)
-
-@app.route('/editar_pedido/<int:pedido_id>', methods=['GET', 'POST'])
-def editar_pedido(pedido_id):
-    pedido = Pedido.query.get_or_404(pedido_id)
-    
-    if request.method == 'POST':
-        pedido.tipo = request.form['tipo']
-        pedido.id_Fornecedor = request.form['fornecedor_id']
-        pedido.id_Cliente = request.form['cliente_id']
-        pedido.id_Colaborador = request.form['colaborador_id']
-        pedido.id_Producao = request.form['producao_id']
-        
-        db.session.commit()
-        flash('Pedido atualizado com sucesso!')
-        return redirect(url_for('lista_pedidos'))  # Referência corrigida aqui
-    
-    fornecedores = Fornecedor.query.all()
-    clientes = Cliente.query.all()
-    colaboradores = Colaborador.query.all()
-    return render_template('editar_pedido.html', pedido=pedido, fornecedores=fornecedores, clientes=clientes, colaboradores=colaboradores)
-
-@app.route('/excluir_pedido/<int:pedido_id>', methods=['POST'])
-def excluir_pedido(pedido_id):
-    pedido = Pedido.query.get_or_404(pedido_id)
-    db.session.delete(pedido)
-    db.session.commit()
-    flash('Pedido excluído com sucesso!')
-    return redirect(url_for('lista_pedidos'))  # Referência corrigida aqui
-
-@app.route('/pesquisar_pedido', methods=['GET'])
-def pesquisar_pedido():
-    # Obtém o parâmetro de tipo da requisição
-    tipo = request.args.get('tipo', '').strip()
-    
-    # Filtra os pedidos com base no tipo, se fornecido
-    if tipo:
-        pedidos = Pedido.query.filter(Pedido.tipo.like(f"%{tipo}%")).all()
-    else:
-        pedidos = Pedido.query.all()
-    
-    # Renderiza o template com a lista de pedidos
-    return render_template('pedido/Pedido.html', pedidos=pedidos)
-
-
 #endregion
-
 
 
 ####################################################################
@@ -520,6 +438,27 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
+
+@app.route('/perfil', methods=['GET'])
+@verificar_acesso(['Vendas', 'Produção', 'Administrador'])
+def perfil():
+    # Obtém o ID do colaborador logado da sessão
+    colaborador_id = session.get('user_id')
+
+    # Verifica se o ID do colaborador está presente na sessão
+    if colaborador_id:
+        colaborador = Colaborador.query.get(colaborador_id)  # Busca o colaborador no banco usando o ID
+        
+        if colaborador:  # Verifica se o colaborador foi encontrado
+            return render_template('home.html', colaborador=colaborador)  # Passa o colaborador para o template
+        else:
+            flash("Colaborador não encontrado.", "danger")
+            return redirect(url_for('home'))
+    else:
+        flash("Você não está logado.", "danger")
+        return redirect(url_for('login'))
+
+
 
 
 # Rota de Login
@@ -552,6 +491,7 @@ def login():
 
 
 
+
 # Rota para Logout
 @app.route('/logout')
 def logout():
@@ -577,9 +517,6 @@ def pagina_erro():
 # Rota Home protegida com verificação direta
 @app.route('/home')
 def home():
-    if 'user_id' not in session:
-        flash('Por favor, faça login para acessar esta página.', 'warning')
-        return redirect(url_for('login'))
     
     # Exibe a página home normalmente se o usuário estiver logado
     return render_template('home.html')
