@@ -17,11 +17,14 @@
     <header class="custom-bg-36802D text-white text-center py-3">
         <h1>Bem-vindo!</h1>
         <div class="mt-5">
-            <a href="/home" class="btn btn-light"><i class="bi bi-house-fill"></i></a><button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#perfilModal"><i class="bi bi-person-circle"></i> Perfil</button>
+            <a href="/home" class="btn btn-light"><i class="bi bi-house-fill"></i></a>  
+            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#perfilModal">Perfil</button>
+
             <a href="/colaborador" class="btn btn-light">Colaborador</a>
             <a href="/producao" class="btn btn-light">Produção</a>
             <a href="/fornecedores" class="btn btn-light">Fornecedor</a>
             <a href="/clientes" class="btn btn-light">Clientes</a>
+            <a href="/pedido" class="btn btn-light">Pedido</a>
             
             <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#configuracaoModal"><i class="bi bi-gear-fill"></i></button>
         </div>
@@ -36,14 +39,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                {% for colaborador in colaboradores %}
+                {% if colaborador %}
                     <div>Nome: {{ colaborador.nome }}</div>
                     <div>Setor: {{ colaborador.setor }}</div>
                     <div>E-mail: {{ colaborador.email }}</div>
                     <div>Login: {{ colaborador.usuario }}</div>
                 {% else %}
                     <div>Colaborador não encontrado.</div>
-                {% endfor %}
+                {% endif %}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -51,6 +54,7 @@
         </div>
     </div>
 </div>
+
 
 
 

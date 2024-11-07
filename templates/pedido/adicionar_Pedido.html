@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <title>Adicionar Pedido</title>
+    <script>
+        // Função para exibir os campos dependendo do tipo de pedido
+        function toggleFields() {
+            var tipoPedido = document.querySelector('input[name="tipo_pedido"]:checked').value;
+            if (tipoPedido === 'recebimento') {
+                document.getElementById('fornecedorFields').style.display = 'block';
+                document.getElementById('clienteFields').style.display = 'none';
+            } else if (tipoPedido === 'venda') {
+                document.getElementById('fornecedorFields').style.display = 'none';
+                document.getElementById('clienteFields').style.display = 'block';
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <!-- Incluindo o cabeçalho -->
+    {% include 'util/cabeca.html' %}
+    <div class="container mt-5">
+        <h2 class="mb-4">Adicionar Pedido</h2>
+
+        <form method="POST" action="{{ url_for('adicionar_pedido') }}">
+            <!-- Tipo de Pedido -->
+            <div class="mb-3">
+                <label class="form-label">Tipo de Pedido</label><br>
+                <input type="radio" id="recebimento" name="tipo_pedido" value="recebimento" onclick="toggleFields()" required>
+                <label for="recebimento">Recebimento</label>
+                <input type="radio" id="venda" name="tipo_pedido" value="venda" onclick="toggleFields()" required>
+                <label for="venda">Venda</label>
+            </div>
+
+            <!-- Campos para Recebimento -->
+            <div id="fornecedorFields" style="display:none;">
+                <div class="mb-3">
+                    <label for="fornecedor" class="form-label">Fornecedor</label>
+                    <select id="fornecedor" name="fornecedor" class="form-control" required>
+                        {% for fornecedor in fornecedores %}
+                        <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="produto" class="form-label">Produto</label>
+                    <select id="produto" name="produto" class="form-control" required>
+                        {% for produto in producao %}
+                        <option value="{{ produto.id }}">{{ produto.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="quantidade" class="form-label">Quantidade</label>
+                    <input type="number" id="quantidade" name="quantidade" class="form-control" required>
+                </div>
+            </div>
+
+            <!-- Campos para Venda -->
+            <div id="clienteFields" style="display:none;">
+                <div class="mb-3">
+                    <label for="cliente" class="form-label">Cliente</label>
+                    <select id="cliente" name="cliente" class="form-control" required>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="produto" class="form-label">Produto</label>
+                    <select id="produto" name="produto" class="form-control" required>
+                        {% for produto in producao %}
+                        <option value="{{ produto.id }}">{{ produto.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="quantidade" class="form-label">Quantidade</label>
+                    <input type="number" id="quantidade" name="quantidade" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="data" class="form-label">Data</label>
+                    <input type="date" id="data" name="data" class="form-control" required>
+                </div>
+            </div>
+
+            <!-- Colaborador (Oculto, mas armazenado) -->
+            <input type="hidden" name="colaborador_id" value="{{ session['user_id'] }}">
+
+            <button type="submit" class="btn btn-success mt-3">Salvar Pedido</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -65,7 +65,8 @@ class Colaborador(db.Model):
     usuario = db.Column('usuario_Colaborador', db.String(50), unique=True, nullable=False)
     senha = db.Column('senha_Colaborador', db.String(128), nullable=False)  # Armazena a senha criptografada
 
-    
+    #pedidos = db.relationship('Pedido', backref='colaborador', lazy=True)
+
 
 
 @app.route('/colaborador')
@@ -175,9 +176,7 @@ class Producao(db.Model):
     data = db.Column('data_Producao', db.Date, nullable=True)
     preco = db.Column('preco_Producao', db.Float, nullable=True)
 
-   
-
-    
+    #pedidos = db.relationship('Pedido', backref='produto', lazy=True)    
 
 
 @app.route('/producao')  # Atualizando a rota
@@ -264,6 +263,8 @@ class Fornecedor(db.Model):
     cnpj_pf = db.Column('cnpj_pf_Fornecedor', db.String(18), nullable=True)
     contato = db.Column('contato_Fornecedor', db.String(100), nullable=True)
     email = db.Column('email_Fornecedor', db.String(100), nullable=True)
+
+    #pedidos = db.relationship('Pedido', backref='fornecedor', lazy=True)
     
     
 
@@ -346,6 +347,8 @@ class Cliente(db.Model):
     cnpj_pf = db.Column('cnpj_pf_Cliente', db.String(18), nullable=True)
     contato = db.Column('contato_Cliente', db.String(100), nullable=True)
     email = db.Column('email_Cliente', db.String(100), nullable=True)
+
+    #pedidos = db.relationship('Pedido', backref='cliente', lazy=True)
     
   
 
@@ -421,6 +424,105 @@ def pesquisar_cliente():
 #PROGRAMAÇÃO pedido
 #region: Pedido
 
+class Pedido(db.Model):
+    __tablename__ = 'Pedido'
+    id = db.Column('id_Pedido', db.Integer, primary_key=True, nullable=False)
+    tipo = db.Column('tipo_Pedido', db.String(20), nullable=False)
+    quantidade = db.Column('quantidade_Pedido', db.Integer, nullable=False)
+    total = db.Column('total_Pedido', db.Float, nullable=False)
+    data = db.Column('data_Pedido', db.Date, nullable=False)
+
+    # Chaves estrangeiras
+    colaborador_id = db.Column(db.Integer, db.ForeignKey('Colaborador.id_Colaborador'), nullable=False)
+    fornecedor_id = db.Column(db.Integer, db.ForeignKey('Fornecedor.id_Fornecedor'), nullable=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey('Cliente.id_Cliente'), nullable=True)
+    produto_id = db.Column(db.Integer, db.ForeignKey('Producao.id_Producao'), nullable=False)
+
+    # Relacionamentos
+    colaborador = db.relationship('Colaborador', backref='pedidos_colaborador', lazy=True)
+    fornecedor = db.relationship('Fornecedor', backref='pedidos', lazy=True)
+    cliente = db.relationship('Cliente', backref='pedidos', lazy=True)
+    produto = db.relationship('Producao', backref='pedidos', lazy=True)
+
+    def __init__(self, tipo, colaborador_id, produto_id, quantidade, data=None, fornecedor_id=None, cliente_id=None):
+        self.tipo = tipo
+        self.colaborador_id = colaborador_id
+        self.produto_id = produto_id
+        self.quantidade = quantidade
+        self.data = data if data else db.func.current_date()  # Usa a data do sistema se não fornecido
+        self.fornecedor_id = fornecedor_id
+        self.cliente_id = cliente_id
+        
+        # Verifica a quantidade disponível antes de criar o pedido
+        if not self.verificar_quantidade_disponivel():
+            raise ValueError("Quantidade solicitada maior do que a quantidade disponível no estoque.")
+        
+        self.total = self.calcular_total()
+
+    def verificar_quantidade_disponivel(self):
+        # Verifica a quantidade disponível no banco de dados na tabela Producao
+        produto = Producao.query.get(self.produto_id)
+        if produto:
+            # Garante que tanto produto.quantidade quanto self.quantidade são inteiros
+            if int(produto.quantidade) >= int(self.quantidade):
+                return True
+        return False
+
+    def calcular_total(self):
+        # Acessa o preço diretamente a partir do produto relacionado
+        produto = Producao.query.get(self.produto_id)  # Busca o produto com o id
+        if produto:
+            # Garante que o preço seja um valor numérico antes de calcular
+            return self.quantidade * float(produto.preco)  # Calcula o total com o preço do produto
+        return 0.0  # Retorna 0 caso o produto não exista
+
+
+    
+
+@app.route('/pedido')
+def pedido():
+    pedidos = Pedido.query.all()
+    return render_template('pedido/Pedido.html', pedidos=pedidos)
+
+
+@app.route('/adicionar_pedido', methods=['GET', 'POST'])
+def adicionar_pedido():
+    if request.method == 'POST':
+        tipo_pedido = request.form['tipo_pedido']
+        fornecedor_id = request.form['fornecedor']  # Para pedidos de recebimento
+        cliente_id = request.form['cliente']  # Para pedidos de venda
+        produto_id = request.form['produto']
+        quantidade = request.form['quantidade']
+        data = datetime.strptime(request.form['data'], '%Y-%m-%d').date()
+
+        # Validação
+        if not tipo_pedido or not produto_id or not quantidade or not data:
+            flash('Por favor, preencha todos os campos obrigatórios.')
+            return redirect('/adicionar_pedido')
+
+        # Criando o pedido
+        novo_pedido = Pedido(
+            tipo=tipo_pedido,  # Usando 'tipo', como definido na classe Pedido
+            fornecedor_id=fornecedor_id if tipo_pedido == 'recebimento' else None,  # Somente para recebimento
+            cliente_id=cliente_id if tipo_pedido == 'venda' else None,  # Somente para venda
+            produto_id=produto_id,
+            quantidade=quantidade,
+            data=data,
+            colaborador_id=session['user_id']  # ID do colaborador logado
+        )
+        db.session.add(novo_pedido)
+        db.session.commit()
+
+        flash('Pedido adicionado com sucesso!')
+        return redirect('/pedido')  # Redirecionando para a página de pedidos
+    
+    # Se for um GET, retorna o formulário de adicionar pedido
+    fornecedores = Fornecedor.query.all()  # Recuperando os fornecedores do banco
+    clientes = Cliente.query.all()  # Recuperando os clientes do banco
+    producao = Producao.query.all()  # Recuperando os produtos da produção
+    return render_template('pedido/adicionar_pedido.html', fornecedores=fornecedores, clientes=clientes, producao=producao)
+
+
 #endregion
 
 
@@ -439,25 +541,24 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Rota para o perfil
 @app.route('/perfil', methods=['GET'])
-@verificar_acesso(['Vendas', 'Produção', 'Administrador'])
 def perfil():
     # Obtém o ID do colaborador logado da sessão
     colaborador_id = session.get('user_id')
 
-    # Verifica se o ID do colaborador está presente na sessão
     if colaborador_id:
-        colaborador = Colaborador.query.get(colaborador_id)  # Busca o colaborador no banco usando o ID
+        colaborador = Colaborador.query.get(colaborador_id)
         
-        if colaborador:  # Verifica se o colaborador foi encontrado
-            return render_template('home.html', colaborador=colaborador)  # Passa o colaborador para o template
+        if colaborador:
+            # Passa o objeto colaborador para o template `home.html`
+            return render_template('home.html', colaborador=colaborador)
         else:
             flash("Colaborador não encontrado.", "danger")
             return redirect(url_for('home'))
     else:
         flash("Você não está logado.", "danger")
         return redirect(url_for('login'))
-
 
 
 
@@ -471,25 +572,18 @@ def login():
         # Busca o colaborador no banco de dados
         colaborador = Colaborador.query.filter_by(usuario=usuario).first()
         
-        if colaborador is not None:  # Verifica se o colaborador foi encontrado
-            print(f"Colaborador encontrado: {colaborador.usuario}")  # Debug
-
-            # Verifica a senha
+        if colaborador:
             if bcrypt.check_password_hash(colaborador.senha, senha):
-                session['user_id'] = colaborador.id  # Armazena o ID do colaborador na sessão
-                session['setor'] = colaborador.setor  # Armazena o setor do colaborador na sessão
-                print("Sessão configurada com ID do colaborador:", session.get('user_id'))  # Debug
-                print("Setor do colaborador:", session.get('setor'))  # Debug
+                session['user_id'] = colaborador.id
+                session['setor'] = colaborador.setor
                 flash('Login realizado com sucesso!', 'success')
-                return redirect(url_for('home'))
+                return redirect(url_for('perfil'))  # Redireciona para a rota /perfil
             else:
                 flash('Senha incorreta.', 'danger')
         else:
             flash('Colaborador não encontrado.', 'danger')
 
     return render_template('cripto/login.html')
-
-
 
 
 # Rota para Logout
