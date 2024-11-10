@@ -36,57 +36,58 @@
                 <label for="venda">Venda</label>
             </div>
 
-            <!-- Campos para Recebimento -->
-            <div id="fornecedorFields" style="display:none;">
-                <div class="mb-3">
-                    <label for="fornecedor" class="form-label">Fornecedor</label>
-                    <select id="fornecedor" name="fornecedor" class="form-control" required>
-                        {% for fornecedor in fornecedores %}
-                        <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="produto" class="form-label">Produto</label>
-                    <select id="produto" name="produto" class="form-control" required>
-                        {% for produto in producao %}
-                        <option value="{{ produto.id }}">{{ produto.nome }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="quantidade" class="form-label">Quantidade</label>
-                    <input type="number" id="quantidade" name="quantidade" class="form-control" required>
-                </div>
-            </div>
+           <!-- Campos para Recebimento -->
+<div id="fornecedorFields" style="display:none;">
+    <div class="mb-3">
+        <label for="fornecedor" class="form-label">Fornecedor</label>
+        <select id="fornecedor" name="fornecedor" class="form-control" required>
+            {% for fornecedor in fornecedores %}
+            <option value="{{ fornecedor.id }}">{{ fornecedor.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="produto" class="form-label">Produto</label>
+        <select id="produto" name="produto" class="form-control" required>
+            {% for produto in producao %}
+            <option value="{{ produto.id }}">{{ produto.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="quantidade" class="form-label">Quantidade</label>
+        <input type="number" id="quantidade" name="quantidade" class="form-control" required>
+    </div>
+</div>
 
-            <!-- Campos para Venda -->
-            <div id="clienteFields" style="display:none;">
-                <div class="mb-3">
-                    <label for="cliente" class="form-label">Cliente</label>
-                    <select id="cliente" name="cliente" class="form-control" required>
-                        {% for cliente in clientes %}
-                        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="produto" class="form-label">Produto</label>
-                    <select id="produto" name="produto" class="form-control" required>
-                        {% for produto in producao %}
-                        <option value="{{ produto.id }}">{{ produto.nome }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="quantidade" class="form-label">Quantidade</label>
-                    <input type="number" id="quantidade" name="quantidade" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="data" class="form-label">Data</label>
-                    <input type="date" id="data" name="data" class="form-control" required>
-                </div>
-            </div>
+<!-- Campos para Venda -->
+<div id="clienteFields" style="display:none;">
+    <div class="mb-3">
+        <label for="cliente" class="form-label">Cliente</label>
+        <select id="cliente" name="cliente" class="form-control" required>
+            {% for cliente in clientes %}
+            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="produto" class="form-label">Produto</label>
+        <select id="produto" name="produto" class="form-control" required>
+            {% for produto in producao %}
+            <option value="{{ produto.id }}">{{ produto.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="quantidade" class="form-label">Quantidade</label>
+        <input type="number" id="quantidade" name="quantidade" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="data" class="form-label">Data</label>
+        <input type="date" id="data" name="data" class="form-control" required>
+    </div>
+</div>
+
 
             <!-- Colaborador (Oculto, mas armazenado) -->
             <input type="hidden" name="colaborador_id" value="{{ session['user_id'] }}">

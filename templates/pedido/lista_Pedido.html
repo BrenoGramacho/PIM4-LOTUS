@@ -18,31 +18,133 @@
             <h2 class="me-3">Lista de Pedidos</h2>
             <!-- Botão para abrir o modal de adicionar pedido -->
             <a href="{{ url_for('adicionar_pedido') }}" class="btn btn-success">Adicionar</a>
-
         </div>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">ID Pedido</th>
-            <th scope="col">Colaborador</th>
-            <th scope="col">Produto</th>
-            <th scope="col">Quantidade</th>
-            <th scope="col">Total</th>
-            <th scope="col">Cliente</th>
-            <th scope="col">Fornecedor</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for pedido in pedidos %}
-        <tr>
-            <td>{{ pedido.id }}</td>
-            <td>{{ pedido.colaborador.nome }}</td>
-            <td>{{ pedido.produto.nome }}</td>
-            <td>{{ pedido.quantidade }}</td>
-            <td>{{ pedido.total }}</td>
-            <td>{{ pedido.cliente.nome if pedido.cliente else 'Não especificado' }}</td>
-            <td>{{ pedido.fornecedor.nome if pedido.fornecedor else 'Não especificado' }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ID Pedido</th>
+                    <th scope="col">Colaborador</th>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Quantidade</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Fornecedor</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                <tr>
+                    <td>{{ pedido.id }}</td>
+                    <td>{{ pedido.colaborador.nome }}</td>
+                    <td>{{ pedido.produto.nome }}</td>
+                    <td>{{ pedido.quantidade }}</td>
+                    <td>{{ pedido.total }}</td>
+                    <td>{{ pedido.cliente.nome if pedido.cliente else 'Não especificado' }}</td>
+                    <td>{{ pedido.fornecedor.nome if pedido.fornecedor else 'Não especificado' }}</td>
+                    <td>{{ pedido.data.strftime('%d/%m/%Y') if pedido.data else 'Não especificado' }}</td>
+                    <td>
+                        <!-- Botão para abrir o modal de edição -->
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editarPedidoModal-{{ pedido.id }}">Editar</button>
+                        
+                        <!-- Botão para abrir o modal de exclusão -->
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal{{ pedido.id }}">Excluir</button>
+                    </td>
+                </tr>
+        
+                <!-- Modal de edição de pedido -->
+                <div class="modal fade" id="editarPedidoModal-{{ pedido.id }}" tabindex="-1" aria-labelledby="editarPedidoLabel-{{ pedido.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editarPedidoLabel-{{ pedido.id }}">Editar Pedido</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="{{ url_for('editar_pedido', pedido_id=pedido.id) }}">
+                                    <div class="mb-3">
+                                        <label for="tipo_pedido" class="form-label">Tipo de Pedido:</label>
+                                        <select class="form-select" id="tipo_pedido" name="tipo_pedido" required>
+                                            <option value="venda" {% if pedido.tipo == 'venda' %}selected{% endif %}>Venda</option>
+                                            <option value="recebimento" {% if pedido.tipo == 'recebimento' %}selected{% endif %}>Recebimento</option>
+                                        </select>
+                                    </div>
+                                
+                                    <div class="mb-3">
+                                        <label for="fornecedor" class="form-label">Fornecedor:</label>
+                                        <select class="form-select" id="fornecedor" name="fornecedor">
+                                            <option value="">Selecione o fornecedor</option>
+                                            {% for fornecedor in fornecedores %}
+                                                <option value="{{ fornecedor.id }}" {% if fornecedor.id == pedido.fornecedor_id %}selected{% endif %}>{{ fornecedor.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                
+                                    <div class="mb-3">
+                                        <label for="cliente" class="form-label">Cliente:</label>
+                                        <select class="form-select" id="cliente" name="cliente">
+                                            <option value="">Selecione o cliente</option>
+                                            {% for cliente in clientes %}
+                                                <option value="{{ cliente.id }}" {% if cliente.id == pedido.cliente_id %}selected{% endif %}>{{ cliente.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                
+                                    <div class="mb-3">
+                                        <label for="produto" class="form-label">Produto:</label>
+                                        <select class="form-select" id="produto" name="produto" required>
+                                            {% for produto in producao %}
+                                                <option value="{{ produto.id }}" {% if produto.id == pedido.produto_id %}selected{% endif %}>{{ produto.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                
+                                    <div class="mb-3">
+                                        <label for="quantidade" class="form-label">Quantidade:</label>
+                                        <input type="number" class="form-control" id="quantidade" name="quantidade" value="{{ pedido.quantidade }}" required>
+                                    </div>
+                                
+                                    <div class="mb-3">
+                                        <label for="data" class="form-label">Data:</label>
+                                        <input type="date" class="form-control" id="data" name="data" value="{{ pedido.data.strftime('%Y-%m-%d') }}" required>
+                                    </div>
+                                
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Salvar</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </form>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de confirmação de exclusão -->
+                <div class="modal fade" id="confirmModal{{ pedido.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-{{ pedido.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmModalLabel-{{ pedido.id }}">Confirmar Exclusão</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Você tem certeza que deseja excluir o pedido <strong>{{ pedido.id }}</strong>?
+                            </div>
+                            <div class="modal-footer">
+                                <form method="POST" action="{{ url_for('excluir_pedido', pedido_id=pedido.id) }}" class="d-inline">
+                                    <button type="submit" class="btn btn-danger">Confirmar</button>
+                                </form>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import datetime
 from functools import wraps
+import webview
 
 #endregion
 
@@ -17,6 +18,11 @@ from functools import wraps
 #region: Inicio
 
 app = Flask(__name__)
+
+window = webview.create_window('Lotus It Solutions', app)
+
+
+
 app.config['SECRET_KEY'] = 'secreto'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://JOAOHERMENEGILD/FazendaUrbanaLotus?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes'
 db = SQLAlchemy(app)
@@ -489,8 +495,8 @@ def pedido():
 def adicionar_pedido():
     if request.method == 'POST':
         tipo_pedido = request.form['tipo_pedido']
-        fornecedor_id = request.form['fornecedor']  # Para pedidos de recebimento
-        cliente_id = request.form['cliente']  # Para pedidos de venda
+        fornecedor_id = request.form.get('fornecedor')  # Para pedidos de recebimento
+        cliente_id = request.form.get('cliente')  # Para pedidos de venda
         produto_id = request.form['produto']
         quantidade = request.form['quantidade']
         data = datetime.strptime(request.form['data'], '%Y-%m-%d').date()
@@ -502,9 +508,9 @@ def adicionar_pedido():
 
         # Criando o pedido
         novo_pedido = Pedido(
-            tipo=tipo_pedido,  # Usando 'tipo', como definido na classe Pedido
-            fornecedor_id=fornecedor_id if tipo_pedido == 'recebimento' else None,  # Somente para recebimento
-            cliente_id=cliente_id if tipo_pedido == 'venda' else None,  # Somente para venda
+            tipo=tipo_pedido,
+            fornecedor_id=fornecedor_id if tipo_pedido == 'recebimento' else None,
+            cliente_id=cliente_id if tipo_pedido == 'venda' else None,
             produto_id=produto_id,
             quantidade=quantidade,
             data=data,
@@ -521,6 +527,66 @@ def adicionar_pedido():
     clientes = Cliente.query.all()  # Recuperando os clientes do banco
     producao = Producao.query.all()  # Recuperando os produtos da produção
     return render_template('pedido/adicionar_pedido.html', fornecedores=fornecedores, clientes=clientes, producao=producao)
+
+
+@app.route('/editar_pedido/<int:pedido_id>', methods=['GET', 'POST'])
+def editar_pedido(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)  # Recupera o pedido pelo ID
+    
+    if request.method == 'POST':
+        tipo_pedido = request.form['tipo_pedido']
+        fornecedor_id = request.form.get('fornecedor')  # Para pedidos de recebimento
+        cliente_id = request.form.get('cliente')  # Para pedidos de venda
+        produto_id = request.form['produto']
+        quantidade = request.form['quantidade']
+        data = datetime.strptime(request.form['data'], '%Y-%m-%d').date()
+
+        # Validação
+        if not tipo_pedido or not produto_id or not quantidade or not data:
+            flash('Por favor, preencha todos os campos obrigatórios.')
+            return redirect(url_for('editar_pedido', pedido_id=pedido_id))
+
+        # Atualizando o pedido
+        pedido.tipo = tipo_pedido
+        pedido.fornecedor_id = fornecedor_id if tipo_pedido == 'recebimento' else None
+        pedido.cliente_id = cliente_id if tipo_pedido == 'venda' else None
+        pedido.produto_id = produto_id
+        pedido.quantidade = quantidade
+        pedido.data = data
+
+        db.session.commit()
+
+        flash('Pedido atualizado com sucesso!')
+        return redirect('/pedido')  # Redirecionando para a página de pedidos
+    
+    # Se for um GET, retorna o formulário de editar pedido
+    fornecedores = Fornecedor.query.all()  # Recuperando os fornecedores do banco
+    clientes = Cliente.query.all()  # Recuperando os clientes do banco
+    producao = Producao.query.all()  # Recuperando os produtos da produção
+    
+    return render_template(
+        'pedido/lista_Pedido.html', 
+        pedido=pedido, 
+        fornecedores=fornecedores, 
+        clientes=clientes, 
+        producao=producao
+    )
+
+
+
+
+
+@app.route('/excluir_pedido/<int:pedido_id>', methods=['POST'])
+def excluir_pedido(pedido_id):
+    try:
+        pedido = Pedido.query.get_or_404(pedido_id)
+        db.session.delete(pedido)
+        db.session.commit()
+        flash('Pedido excluído com sucesso!', 'success')
+    except Exception as e:
+        flash(f'Ocorreu um erro ao excluir o pedido: {e}', 'danger')
+    return redirect(url_for('pedido'))  # Redireciona para a lista de pedidos
+
 
 
 #endregion
@@ -628,5 +694,8 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Cria as tabelas do banco de dados
     app.run(debug=True)
+    #webview.start()
+    
+    
 
 #endregion
