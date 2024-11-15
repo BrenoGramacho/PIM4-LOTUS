@@ -18,24 +18,38 @@ import webview
 
 #region: Configuração inicial do aplicativo
 
-app = Flask(__name__)
+from flask import Flask, render_template, request, redirect, flash, url_for, session
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from datetime import datetime
+from functools import wraps
+import pyodbc
 
-# Cria uma janela de visualização web para o aplicativo usando WebView
-window = webview.create_window('Lotus It Solutions', app)
+app = Flask(__name__)
 
 # Configuração da chave secreta para sessões e criptografia
 app.config['SECRET_KEY'] = 'secreto'
 
-# Configuração do URI para conexão com o banco de dados SQL Server
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://sqlserver:sqlserver@34.42.214.94/fazendaurbanalotus?driver=ODBC+Driver+17+for+SQL+Server'
-#self.conn_str = 'Driver=ODBC Driver 17 for SQL Server;Server=endpoint;'Database=fazendaurbanalotusdb;UID=sqlserver;PWD=sqlserver;Trusted_Connection=yes;'
+# Configurando a conexão com o banco para o SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    'mssql+pyodbc://sqlserver:sqlserver@fazendaurbanalotusdb.c7wqk0i0qbea.us-east-1.rds.amazonaws.com/lotus?driver=ODBC+Driver+17+for+SQL+Server'
+)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://JOAOHERMENEGILD/FazendaUrbanaLotus?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes'
-# DICA: Caso precise de outra conexão com o banco de dados, basta criar uma nova variável e comentar esta configuração.
-
-# Inicializa o banco de dados e a ferramenta de hashing Bcrypt para o aplicativo
+# Inicializando o banco de dados e Bcrypt
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+
+# Testando conexão com o pyodbc diretamente (opcional)
+conn_str = (
+    r'Driver={ODBC Driver 17 for SQL Server};'
+    r'Server=fazendaurbanalotusdb.c7wqk0i0qbea.us-east-1.rds.amazonaws.com;'
+    r'Database=master;'
+    r'UID=sqlserver;'
+    r'PWD=sqlserver;'
+)
+connection = pyodbc.connect(conn_str)
+cursor = connection.cursor()
+print("Conexão bem-sucedida!")
 
 # Lista de rotas que não exigem login (acesso livre)
 rotas_livres = ['/', '/login']
