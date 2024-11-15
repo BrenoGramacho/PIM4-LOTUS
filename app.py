@@ -34,25 +34,15 @@ app.config['SECRET_KEY'] = 'secreto'
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     'mssql+pyodbc://sqlserver:sqlserver@fazendaurbanalotusdb.c7wqk0i0qbea.us-east-1.rds.amazonaws.com/lotus?driver=ODBC+Driver+17+for+SQL+Server'
 )
+print("Conexão bem-sucedida!")
 
 # Inicializando o banco de dados e Bcrypt
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# Testando conexão com o pyodbc diretamente (opcional)
-conn_str = (
-    r'Driver={ODBC Driver 17 for SQL Server};'
-    r'Server=fazendaurbanalotusdb.c7wqk0i0qbea.us-east-1.rds.amazonaws.com;'
-    r'Database=master;'
-    r'UID=sqlserver;'
-    r'PWD=sqlserver;'
-)
-connection = pyodbc.connect(conn_str)
-cursor = connection.cursor()
-print("Conexão bem-sucedida!")
 
 # Lista de rotas que não exigem login (acesso livre)
-rotas_livres = ['/', '/login']
+rotas_livres = ['/', '/login', '/colaborador']
 
 # Função que é executada antes de cada requisição para verificar o login
 @app.before_request
