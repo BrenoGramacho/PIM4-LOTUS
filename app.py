@@ -27,6 +27,9 @@ window = webview.create_window('Lotus It Solutions', app)
 app.config['SECRET_KEY'] = 'secreto'
 
 # Configuração do URI para conexão com o banco de dados SQL Server
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://sqlserver:sqlserver@34.42.214.94/fazendaurbanalotus?driver=ODBC+Driver+17+for+SQL+Server'
+#self.conn_str = 'Driver=ODBC Driver 17 for SQL Server;Server=endpoint;'Database=fazendaurbanalotusdb;UID=sqlserver;PWD=sqlserver;Trusted_Connection=yes;'
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://JOAOHERMENEGILD/FazendaUrbanaLotus?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes'
 # DICA: Caso precise de outra conexão com o banco de dados, basta criar uma nova variável e comentar esta configuração.
 
@@ -726,5 +729,6 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Cria as tabelas do banco de dados, se ainda não existirem
     app.run(debug=True)  # Inicia a aplicação em modo de depuração    
+    #webview.start()
 
 #endregion
