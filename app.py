@@ -18,14 +18,8 @@ import webview
 
 #region: Configuração inicial do aplicativo
 
-from flask import Flask, render_template, request, redirect, flash, url_for, session
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from datetime import datetime
-from functools import wraps
-import pyodbc
-
 app = Flask(__name__)
+
 
 # Configuração da chave secreta para sessões e criptografia
 app.config['SECRET_KEY'] = 'secreto'
@@ -42,7 +36,7 @@ bcrypt = Bcrypt(app)
 
 
 # Lista de rotas que não exigem login (acesso livre)
-rotas_livres = ['/', '/login', '/colaborador']
+rotas_livres = ['/', '/login']
 
 # Função que é executada antes de cada requisição para verificar o login
 @app.before_request
@@ -728,11 +722,13 @@ def home():
 
 #region: Main
 
+window = webview.create_window('Lotus It Solutions', app)
+
 # Código principal para rodar a aplicação
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Cria as tabelas do banco de dados, se ainda não existirem
     app.run(debug=True)  # Inicia a aplicação em modo de depuração    
-    #webview.start()
+    #webview.start() # Inicia a aplicação em modo de produção
 
 #endregion

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- Referência ao CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+
+<div class="main-content">
+    <div class="info">
+        <div class="content">
+            <h2>Lotus It Solutions ltda</h2>
+            <h1>Soluções de tecnologia para fazendas urbanas</h1>
+            <p>A Lotus IT Solutions ltda. tem como objetivo principal desenvolver soluções de software especializadas para fazendas urbanas, 
+            visando otimizar o gerenciamento, controle e produtividade nesses ambientes específicos.</p>
+            <p>Nosso objetivo é fornecer soluções completas e inovadoras que permitam aos nossos clientes enfrentar os desafios do gerenciamento agrícola em ambientes urbanos de forma eficiente e sustentável.</p>
+        </div>
+        <div class="espaçoimagem">
+            <!-- Imagem com `url_for` -->
+            <img src="{{ url_for('static', filename='images/noun-lotus-14165.svg') }}" alt="Lotus">
+        </div>
+    </div>
+    
+    <div class="Regras">
+        <div class="RegrasTitulo">
+            <h3>Regras de negócio da empresa</h3>
+        </div>
+        <div class="RegrasInfo">
+            <p>Priorizamos a segurança da informação, seguimos metodologia ágil de gerenciamento de projetos como o Scrum e nos comprometemos com a conformidade com a LGPD.</p>
+            <p>Implementamos uma política abrangente de segurança da informação, em conformidade com a Lei Geral de Proteção de Dados, para proteger dados confidenciais contra acesso não autorizado, roubo ou vazamento.</p>
+            <p>Para fortalecer o relacionamento com os clientes, adotamos a metodologia de Customer Relationship Management (CRM), mantendo um canal de comunicação aberto e transparente e oferecendo um atendimento personalizado e eficiente.</p>
+        </div>
+    </div>
+
+    <div class="Fazendas">
+        <div class="FazendaTitulo">
+            <h3>O que são Fazendas Urbanas</h3>
+        </div>
+        <div class="FazendaInfo">
+            <p>As fazendas urbanas surgem como uma resposta dinâmica aos desafios da urbanização e da segurança alimentar, transformando o tecido urbano em terreno fértil para a produção agrícola e comunitária.</p>
+            <p>Além de proporcionar alimentos frescos e saudáveis, as fazendas urbanas desempenham um papel crucial na educação ambiental e na criação de espaços de convivência. Reduzindo a distância entre a produção e o consumo de alimentos, essas iniciativas também contribuem para a mitigação das emissões de carbono relacionadas ao transporte de alimentos.</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

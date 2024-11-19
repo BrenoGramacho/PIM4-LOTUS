@@ -1,0 +1,241 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    color: #1d1d1f;
+    
+}
+
+.main-content {
+    margin: 20px 0px;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px;
+    max-width: 1200px;
+
+}
+
+.content {
+    max-width: 1000px;
+    text-align: left;
+    margin: 5%;
+}
+
+.content h2 {
+    color: #000000;
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.content h1 {
+    color: #004b41;
+    font-size: 80px;
+    line-height: 1.2;
+}
+
+.content p {
+    font-size: 20px;
+    color: #4a4a4a;
+    margin: 20px 0px;
+}
+
+.espaçoimagem img {
+    width: 450%;
+}
+
+.Regras {
+    display: flex;
+    justify-content:space-around;
+    padding: 40px 20px;
+    background-color: #36802D;
+    margin-top: 20px;
+}
+
+.RegrasTitulo {
+    text-align:left;
+    max-width: 700px;
+}
+
+.RegrasTitulo h3 {
+    color: #000000;
+    font-size: 40px;
+    margin: 30px;
+    max-width: 400px;
+    text-align: center;
+}
+
+.RegrasInfo p {
+    color: #000000;
+    font-size: 20px;
+    margin: 20px;
+}
+
+.Fazendas {
+    display: flex;
+    justify-content:space-around;
+    padding: 40px 20px;
+    background-color: #36802D;
+    margin-top: 40px;
+}
+
+.FazendasTitulo {
+    text-align: left;
+    max-width: 700px;
+}
+
+.FazendaTitulo h3{
+    color: #000000;
+    font-size: 40px;
+    margin: 50px;
+    max-width: 800px;
+    text-align: center;
+}
+
+.FazendaInfo p {
+    color: #000000;
+    font-size: 20px;
+    margin:30px;   
+}
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 550px);
+    gap: 10px;
+    justify-content: space-around;
+}
+
+.grid-item {
+    padding: 20px 10px;
+    color: white;
+    border-radius: 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1em;
+}
+
+.grid-item img {
+    width: 500px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.item1 { background-color: #234d20;}
+.item2 { background-color: #234d20;}
+.item3 { background-color: #234d20;}
+
+.Titulo2 {
+    display: block;
+    margin: auto;
+    padding: 40px;
+    max-width: 1200px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.footer {
+    background-color: #3c7d32;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 800px;
+    margin: auto;
+}
+
+.footer-content p {
+    margin: 5px 0;
+}
+
+.footer-content a {
+    color: #f0f0f0;
+    text-decoration: none;
+}
+
+.footer-content a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para centralizar os itens no Quadro de Avisos */
+.container {
+    display: flex; /* Ativa o Flexbox */
+    flex-wrap: wrap; /* Permite que os itens se reorganizem em várias linhas */
+    justify-content: center; /* Centraliza os itens horizontalmente */
+    gap: 20px; /* Adiciona espaçamento entre os itens */
+    padding: 20px; /* Adiciona um espaçamento interno */
+}
+
+.grid-item {
+    flex: 1 1 calc(33.333% - 40px); /* Itens ocupam até 1/3 da largura e ajustam conforme o espaço */
+    max-width: 300px; /* Limita a largura máxima */
+    box-sizing: border-box; /* Inclui padding e borda no tamanho total */
+    border: 5px solid #2b5329; /* Mantém a borda mais grossa */
+    border-radius: 10px; /* Cantos arredondados */
+    background-color: #ffffff; /* Fundo branco */
+    overflow: hidden; /* Impede que o conteúdo ultrapasse os limites */
+    text-align: center; /* Centraliza o texto */
+}
+
+.grid-item img {
+    width: 100%; /* Imagem ocupa 100% da largura disponível */
+    height: auto; /* Mantém a proporção */
+    display: block; /* Remove o espaço embaixo da imagem (por padrão, as imagens são elementos inline e podem gerar esse espaço) */
+    border-radius: 10px 10px 0 0; /* Cantos arredondados apenas no topo */
+    /* Removendo a borda inferior da imagem */
+    border-bottom: none; /* Retira a borda inferior para evitar a linha */
+}
+
+
+.grid-item p {
+    margin: 10px;
+    font-size: 16px;
+    color: #2b5329;
+    font-family: Arial, sans-serif;
+}
+
+/* Justificar textos */
+.info .content p,
+.RegrasInfo p,
+.FazendaInfo p {
+    text-align: justify; /* Justifica o texto */
+    margin: 10px 0; /* Adiciona espaçamento entre os parágrafos */
+    line-height: 1.6; /* Melhora o espaçamento entre linhas */
+}
+
+/* Estilo padrão para os títulos */
+h1, h2, h3 {
+    text-align: left; /* Alinha os títulos à esquerda */
+    margin: 10px 0;
+    font-family: Arial, sans-serif; /* Escolha uma fonte elegante */
+}
+
+/* Opcional: Melhor organização do layout */
+.main-content {
+    padding: 20px;
+    font-family: Arial, sans-serif; /* Define a fonte geral */
+    color: #333; /* Cor do texto */
+}
+
+
+.Titulo4 {
+    text-align: center; /* Centraliza o conteúdo dentro da div */
+    margin-top: 20px; /* Adiciona espaço acima */
+    margin-bottom: 20px; /* Adiciona espaço abaixo */
+}
+
+.Titulo4 h4 {
+    font-weight: bold; 
+    font-size: 2.5rem; 
+}

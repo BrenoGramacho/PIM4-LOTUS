@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- Referência ao CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <div class="Titulo4">
+        <h4>Quadro de avisos</h4>
+    </div>
+
+    <div class="container">
+        <div class="grid-item">
+            <img src="{{ url_for('static', filename='images/setembroA.jpg') }}" alt="Setembro Amarelo">
+        </div>
+        <div class="grid-item">
+            <img src="{{ url_for('static', filename='images/Vacinacao.jpg') }}" alt="Campanha de Vacinação">
+        </div>
+        <div class="grid-item">
+            <img src="{{ url_for('static', filename='images/direito13.jpg') }}" alt="13º Salário">
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Lotus IT Solutions. Todos os direitos reservados.</p>
+            <p><a href="#">Política de Privacidade</a> | <a href="#">Termos de Serviço</a></p>
+            <p>Contato: contato@lotusitsolutions.com | Telefone: (11) 1234-5678</p>
+        </div>
+    </footer>
+</body>
+</html>
