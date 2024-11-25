@@ -6,12 +6,15 @@
     <title>Home</title>
     <!-- Referência ao CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+
 </head>
 <body>
     <!-- Referência ao cabeçalho -->
     {% include '/util/cabeca.html' %}
-
     {% include '/home/quadroAviso.html' %}
+    {% include '/util/footer.html' %}
+
+    
     
 
 

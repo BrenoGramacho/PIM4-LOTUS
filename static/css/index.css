@@ -11,6 +11,11 @@ body {
     
 }
 
+.top { 
+    color: #ffffff;
+    background-color: #3c7d32;
+    padding: 20px;
+}
 .main-content {
     margin: 20px 0px;
 }
@@ -56,17 +61,18 @@ body {
     display: flex;
     justify-content:space-around;
     padding: 40px 20px;
+    border-radius: 16px;
     background-color: #36802D;
     margin-top: 20px;
 }
 
 .RegrasTitulo {
-    text-align:left;
+    text-align: center;
     max-width: 700px;
 }
 
 .RegrasTitulo h3 {
-    color: #000000;
+    color: #ffffff;
     font-size: 40px;
     margin: 30px;
     max-width: 400px;
@@ -74,7 +80,7 @@ body {
 }
 
 .RegrasInfo p {
-    color: #000000;
+    color: #ffffff;
     font-size: 20px;
     margin: 20px;
 }
@@ -83,6 +89,7 @@ body {
     display: flex;
     justify-content:space-around;
     padding: 40px 20px;
+    border-radius: 16px;
     background-color: #36802D;
     margin-top: 40px;
 }
@@ -93,7 +100,7 @@ body {
 }
 
 .FazendaTitulo h3{
-    color: #000000;
+    color: #ffffff;
     font-size: 40px;
     margin: 50px;
     max-width: 800px;
@@ -101,7 +108,7 @@ body {
 }
 
 .FazendaInfo p {
-    color: #000000;
+    color: #ffffff;
     font-size: 20px;
     margin:30px;   
 }

@@ -1,16 +1,14 @@
-####################################################################
-#Programação requirements
-
-
 
 #region: Requirements
 
-from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import datetime
 from functools import wraps
 import webview
+import tkinter as tk  # Para pegar o tamanho da tela
+import os
 
 # Instalação de bibliotecas necessárias:
 # Execute 'pip install -r requirements.txt' para instalar todas as bibliotecas listadas no arquivo.
@@ -20,8 +18,15 @@ import webview
 
 #region: Configuração inicial do aplicativo
 
-app = Flask(__name__)
 
+# Configura o caminho estático para servir arquivos corretamente
+static_folder_path = os.path.join(os.getcwd(), 'static')
+app = Flask(__name__, static_folder=static_folder_path)
+
+# Servir arquivos estáticos diretamente no modo desktop
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory(static_folder_path, filename)
 
 # Configuração da chave secreta para sessões e criptografia
 app.config['SECRET_KEY'] = 'secreto'
@@ -70,7 +75,6 @@ def verificar_acesso(setores_permitidos):
 
 #endregion
 
-
 #region: Test
 
 @app.route('/saudacao/<nome>')
@@ -82,8 +86,7 @@ def saudacao(nome):
     return jsonify(mensagem=f"Olá, {nome}!")
 
 #endregion:
-####################################################################
-#Programação colaboradores
+
 #region: Colaboradores
 
 class Colaborador(db.Model):
@@ -215,8 +218,6 @@ def alterar_senha():
 
 #endregion
 
-####################################################################
-#PROGRAMAÇÃO producao
 #region: Producao
 
 
@@ -317,8 +318,6 @@ def pesquisar_producao():
 
 #endregion
 
-####################################################################
-#PROGRAMAÇÃO fornecedor
 #region: Fornecedor
 
 # Definindo a classe Fornecedor que representa a tabela 'Fornecedor' no banco de dados
@@ -409,8 +408,6 @@ def pesquisar_fornecedor():
 
 #endregion
 
-####################################################################
-#PROGRAMAÇÃO cliente
 #region: Cliente
 # Definindo a classe Cliente que representa a tabela 'Cliente' no banco de dados
 class Cliente(db.Model):
@@ -500,8 +497,6 @@ def pesquisar_cliente():
 
 #endregion
 
-####################################################################
-#PROGRAMAÇÃO pedido
 #region: Pedido
 
 class Pedido(db.Model):
@@ -650,8 +645,6 @@ def excluir_pedido(pedido_id):
 
 #endregion
 
-####################################################################
-#PROGRAMAÇÃO login
 #region: Login
 
 # Decorador para verificar login
@@ -719,9 +712,6 @@ def pagina_erro():
 
 #endregion
 
-#####################################################################
-#Programação home
-
 #region: Home
 
 # Rota Home protegida com verificação direta
@@ -731,18 +721,22 @@ def home():
 
 #endregion
 
-#####################################################################
-#Programação main
-
 #region: Main
 
-window = webview.create_window('Lotus It Solutions', app)
+
+# Obtém o tamanho da tela do sistema
+root = tk.Tk()
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+# Cria a janela com as dimensões da tela
+window = webview.create_window('Lotus It Solutions', app, width=screen_width, height=screen_height)
 
 # Código principal para rodar a aplicação
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Cria as tabelas do banco de dados, se ainda não existirem
-    app.run(debug=True)  # Inicia a aplicação em modo de depuração    
-    #webview.start() # Inicia a aplicação em modo de produção
+    # app.run(debug=True)  # Inicia a aplicação em modo de depuração    
+    webview.start()  # Inicia a aplicação em modo de produção
 
 #endregion
