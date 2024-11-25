@@ -1,9 +1,11 @@
 ####################################################################
 #Programação requirements
 
+
+
 #region: Requirements
 
-from flask import Flask, render_template, request, redirect, flash, url_for, session
+from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import datetime
@@ -68,6 +70,18 @@ def verificar_acesso(setores_permitidos):
 
 #endregion
 
+
+#region: Test
+
+@app.route('/saudacao/<nome>')
+def saudacao(nome):
+    """
+    Função que retorna uma saudação personalizada.
+    Exemplo de URL: /saudacao/Joao
+    """
+    return jsonify(mensagem=f"Olá, {nome}!")
+
+#endregion:
 ####################################################################
 #Programação colaboradores
 #region: Colaboradores
